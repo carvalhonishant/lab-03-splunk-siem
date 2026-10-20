@@ -1,8 +1,7 @@
 # SIEM Detection Lab: SSH Brute Force in Splunk
 
-I stood up Splunk, fed it Linux SSH logs, and built a detection that catches a brute force attack and proves the attacker got in. The whole chain is here: ingest the data, hunt through it with SPL, turn the hunt into a scheduled alert, and put it on a dashboard. One external IP tried 120 logins across ten accounts and then succeeded on the admin account, and the detection catches exactly that pattern.
+I installed Splunk, fed it Linux SSH logs, and built a detection that catches a brute force attack and proves the attacker got in. The whole chain is here: ingest the data, hunt through it with SPL, turn the hunt into a scheduled alert, and put it on a dashboard. One external IP tried 120 logins across ten accounts and then succeeded on the admin account, and the detection catches exactly that pattern.
 
-I am an IT support engineer moving into security, and I already hold the Splunk Security Operations and Defense Analyst cert, so this lab is me putting that to work rather than just talking about it.
 
 ## The setup
 
@@ -112,7 +111,7 @@ The point of the dashboard is that an analyst glancing at it sees the attack in 
 
 ## Skills this shows
 
-Standing up Splunk, data onboarding and source typing, writing SPL (rex, stats, eval, correlation), building a threshold based detection, saving it as a scheduled alert, and presenting findings on a dashboard. The end to end workflow of a SOC analyst, from raw log to alert.
+Setting up Splunk, data onboarding and source typing, writing SPL (rex, stats, eval, correlation), building a threshold based detection, saving it as a scheduled alert, and presenting findings on a dashboard. The end to end workflow of a SOC analyst, from raw log to alert.
 
 ---
 
