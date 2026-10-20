@@ -1,0 +1,43 @@
+# Lab 03 detections and hunting searches (SPL)
+# Source type: linux_secure   Index: linux_lab
+# Run over All time against the sample auth.log.
+
+# ---------------------------------------------------------------
+# 1. Failed logins over time (dashboard: Failed Logins Over Time)
+#    Shows the brute force burst as a spike.
+# ---------------------------------------------------------------
+index=linux_lab sourcetype=linux_secure "Failed password"
+| timechart span=5m count as failed_logins
+
+
+# ---------------------------------------------------------------
+# 2. Top source IPs by failed logins (dashboard: Top Source IPs)
+#    The attacker IP towers over normal internal typos.
+# ---------------------------------------------------------------
+index=linux_lab sourcetype=linux_secure "Failed password"
+| rex "from (?<src_ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+| stats count as failures by src_ip
+| sort -failures
+
+
+# ---------------------------------------------------------------
+# 3. Brute force followed by a successful login (THE DETECTION)
+#    Flags any source IP with many failures AND at least one success.
+#    This is saved as a scheduled alert that runs hourly.
+# ---------------------------------------------------------------
+index=linux_lab sourcetype=linux_secure
+| rex "from (?<src_ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+| rex "for (?:invalid user )?(?<user>\S+) from"
+| stats count(eval(match(_raw,"Failed password"))) as failures
+        count(eval(match(_raw,"Accepted password"))) as successes
+        values(user) as users_tried
+        by src_ip
+| where failures > 20 AND successes > 0
+
+
+# ---------------------------------------------------------------
+# 4. The confirmed breach event (the smoking gun)
+#    The single successful login from the attacker IP.
+# ---------------------------------------------------------------
+index=linux_lab sourcetype=linux_secure "Accepted password" "203.0.113.45"
+| table _time, _raw
